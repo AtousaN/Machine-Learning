@@ -1,0 +1,43 @@
+MSE = []
+j = []
+for i in range(4):
+    d = [5, 10, 25, 100]
+    D = d[i]
+    x = (np.random.rand(D, 1)-0.5) * 20
+    xt = np.ones((1,D))
+    f = x[:,0]
+
+    for K in range(1,11) :
+        #print('j=', j, 'type=', type(j), 'j size=', len(j))
+        #j = j.append(K)
+        
+        W = np.ones((K+1, 1))
+        for i in range(1, K+1):
+            xt = np.append(xt, f**i)
+        XT = xt.reshape(K+1, D)
+        X = np.transpose(XT)
+        Y = np.dot(X,W)
+        Y_norm = Y + np.random.normal(scale=3, size=Y.shape)
+        
+        poly_features = PolynomialFeatures(degree = K, include_bias = False) 
+        x_poly = poly_features.fit_transform(x) 
+        lin_reg = LinearRegression() 
+        lin_reg.fit(x_poly, Y_norm) 
+        print('Coefficients of x are', lin_reg.coef_) 
+        print('Intercept is', lin_reg.intercept_)
+        
+        y_deg = lin_reg.predict(x_poly) 
+        mse_deg = mean_squared_error(Y_norm, y_deg) 
+        r2_deg = r2_score(Y_norm, y_deg)
+        MSE = MSE.append(mse)
+
+        print('MSE of Polyregression model', mse_deg) 
+        print('R2 score of Linear model: ', r2_deg) 
+    j = j.reshape(-1,10)
+    MSE = MSE.reshape(-1,10)
+    color = ['g.', 'r.', 'c.', 'm.']
+    plt.plot(j, MSE, color[i]) 
+    plt.xlabel("$Degree$", fontsize = 18) 
+    plt.ylabel("$mse$", rotation = 0, fontsize = 18) 
+    plt.legend(loc ="upper left", fontsize = 14)   
+    plt.title("Error Reduction")
